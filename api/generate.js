@@ -6,12 +6,19 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const { prompt } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
+    const { prompt } = req.body || {};
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'prompt 不能为空' });
+    }
+
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
     if (!OPENAI_API_KEY) {
       return res.status(500).json({ error: 'OPENAI_API_KEY 未读取到' });
     }
@@ -31,17 +38,30 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log("openai response:", JSON.stringify(data));
+    console.log("OpenAI status:", response.status);
+    console.log("OpenAI response:", JSON.stringify(data));
 
-    if (data.error) {
-      return res.status(500).json({ error: data.error.message });
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: data?.error?.message || 'OpenAI 请求失败',
+        raw: data
+      });
     }
 
-    const text = data.choices?.[0]?.message?.content || '';
-    return res.status(200).json({ text });
+    const text = data?.choices?.[0]?.message?.content;
 
+    if (!text) {
+      return res.status(500).json({
+        error: 'OpenAI 返回成功，但没有拿到 text',
+        raw: data
+      });
+    }
+
+    return res.status(200).json({ text });
   } catch (err) {
     console.error("generate error:", err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({
+      error: err?.message || '服务器内部错误'
+    });
   }
 }
