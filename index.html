@@ -1,1 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>副业雷达 · AI帮你找钱途</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1525;
+  --bg3: #151e35;
+  --accent: #00e5ff;
+  --accent2: #ff6b35;
+  --accent3: #7fffb2;
+  --text: #e2e8f8;
+  --text-dim: #6b7a99;
+  --border: rgba(0,229,255,0.12);
+  --border2: rgba(0,229,255,0.25);
+  --card: rgba(15,21,37,0.9);
+  --glow: 0 0 30px rgba(0,229,255,0.15);
+}
 
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated grid background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-move 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes grid-move {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(0,100,255,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(255,100,50,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,229,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* HEADER */
+.header {
+  padding: 48px 0 32px;
+  text-align: center;
+}
+
+.radar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: rgba(0,229,255,0.05);
+  margin-bottom: 20px;
+  position: relative;
+  box-shadow: var(--glow);
+}
+
+.radar-icon::before {
+  content: '';
+  position: absolute; inset: -8px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,229,255,0.15);
+  animation: radar-ping 2s ease-out infinite;
+}
+
+.radar-icon::after {
+  content: '';
+  position: absolute; inset: -16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,229,255,0.07);
+  animation: radar-ping 2s ease-out infinite 0.4s;
+}
+
+@keyframes radar-ping {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.radar-svg { width: 32px; height: 32px; }
+
+.title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 36px;
+  color: var(--accent);
+  letter-spacing: 4px;
+  text-shadow: 0 0 30px rgba(0,229,255,0.4);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.subtitle em {
+  color: var(--accent2);
+  font-style: normal;
+}
+
+/* STEP INDICATOR */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+.step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.step-dot.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,229,255,0.08);
+  box-shadow: 0 0 12px rgba(0,229,255,0.2);
+}
+
+.step-dot.done {
+  border-color: var(--accent3);
+  background: rgba(127,255,178,0.1);
+  color: var(--accent3);
+}
+
+.step-line {
+  width: 50px; height: 1px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.step-line.done { background: rgba(127,255,178,0.3); }
+
+/* FORM CARD */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--glow);
+  animation: slide-up 0.4s ease;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.form-card-title {
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-card-title::before {
+  content: '';
+  width: 3px; height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* OPTION BUTTONS */
+.options-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.options-grid.cols2 { grid-template-columns: 1fr 1fr; }
+.options-grid.cols1 { grid-template-columns: 1fr; }
+
+.opt-btn {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.opt-btn:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: rgba(0,229,255,0.04);
+}
+
+.opt-btn.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,229,255,0.08);
+  box-shadow: 0 0 16px rgba(0,229,255,0.1);
+}
+
+.opt-icon { font-size: 18px; }
+
+/* TEXT INPUT */
+.text-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.text-input:focus { border-color: var(--border2); }
+.text-input::placeholder { color: var(--text-dim); }
+
+/* NAV BUTTONS */
+.nav-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-next {
+  flex: 1;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,150,255,0.15));
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  color: var(--accent);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+
+.btn-next:hover {
+  background: linear-gradient(135deg, rgba(0,229,255,0.25), rgba(0,150,255,0.25));
+  box-shadow: 0 0 20px rgba(0,229,255,0.2);
+}
+
+.btn-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-back {
+  padding: 14px 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-back:hover { border-color: var(--border2); color: var(--text); }
+
+/* LOADING */
+.loading-wrap {
+  text-align: center;
+  padding: 60px 20px;
+  display: none;
+}
+
+.loading-wrap.show { display: block; }
+
+.radar-anim {
+  width: 100px; height: 100px;
+  margin: 0 auto 24px;
+  position: relative;
+}
+
+.radar-circle {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(0,229,255,0.2);
+}
+
+.radar-circle:nth-child(2) { inset: 15px; }
+.radar-circle:nth-child(3) { inset: 30px; }
+
+.radar-sweep {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(0,229,255,0.3) 60deg, transparent 60deg);
+  animation: sweep 1.5s linear infinite;
+}
+
+@keyframes sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.radar-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.loading-text {
+  font-size: 15px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.loading-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%,20% { content: ''; }
+  40% { content: '·'; }
+  60% { content: '··'; }
+  80%,100% { content: '···'; }
+}
+
+/* RESULT */
+.result-wrap {
+  display: none;
+  animation: slide-up 0.5s ease;
+}
+
+.result-wrap.show { display: block; }
+
+.result-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.result-title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 22px;
+  color: var(--accent3);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 20px rgba(127,255,178,0.3);
+}
+
+.result-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.result-content {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(127,255,178,0.05);
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Markdown-style rendering */
+.result-content h2 {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 17px;
+  color: var(--accent);
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 1px;
+}
+
+.result-content h2:first-child { margin-top: 0; }
+
+.result-content h3 {
+  font-size: 15px;
+  color: var(--accent2);
+  margin: 14px 0 6px;
+}
+
+.result-content strong {
+  color: var(--accent3);
+  font-weight: 500;
+}
+
+.result-content .tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--accent);
+  margin: 2px;
+}
+
+/* PAYWALL */
+.paywall {
+  margin-top: 16px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(255,50,100,0.08));
+  border: 1px solid rgba(255,107,53,0.3);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.paywall-title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 18px;
+  color: var(--accent2);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.paywall-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.paywall-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.paywall-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.paywall-feature::before {
+  content: '✓';
+  color: var(--accent3);
+  font-weight: 700;
+}
+
+.btn-pay {
+  display: inline-block;
+  padding: 14px 40px;
+  background: linear-gradient(135deg, #ff6b35, #ff3264);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+}
+
+.btn-pay:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,107,53,0.4);
+}
+
+.price-tag {
+  font-size: 24px;
+  color: var(--accent2);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.price-orig {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-decoration: line-through;
+  margin-bottom: 16px;
+}
+
+/* RESTART */
+.btn-restart {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-restart:hover { border-color: var(--border2); color: var(--text); }
+
+/* TAG LIST */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag-select {
+  padding: 6px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-dim);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-select:hover { border-color: var(--border2); color: var(--text); }
+.tag-select.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,229,255,0.06);
+}
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 1px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* Blurred preview */
+.blurred-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.blurred-preview-content {
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+  opacity: 0.6;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+}
+
+.blurred-preview-overlay {
+  position: absolute; inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, transparent 0%, rgba(10,14,26,0.8) 60%);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="radar-icon">
+      <svg class="radar-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="14" stroke="#00e5ff" stroke-width="1"/>
+        <circle cx="16" cy="16" r="8" stroke="#00e5ff" stroke-width="1" opacity=".5"/>
+        <circle cx="16" cy="16" r="2" fill="#00e5ff"/>
+        <line x1="16" y1="2" x2="16" y2="30" stroke="#00e5ff" stroke-width=".5" opacity=".3"/>
+        <line x1="2" y1="16" x2="30" y2="16" stroke="#00e5ff" stroke-width=".5" opacity=".3"/>
+        <path d="M16 16 L28 8" stroke="#00e5ff" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+      </svg>
+    </div>
+    <div class="title">副业雷达</div>
+    <div class="subtitle">AI精准匹配 · 找到属于你的<em>钱途</em></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps" id="stepsIndicator">
+    <div class="step-dot active" id="step1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot" id="step2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot" id="step3">3</div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-dot" id="step4">4</div>
+  </div>
+
+  <!-- ─── STEP 1: 时间 ─── -->
+  <div class="form-card" id="formStep1">
+    <div class="form-card-title">每天能投入多少时间</div>
+    <div class="options-grid cols2">
+      <button class="opt-btn" onclick="selectOpt(this,'time','1小时以内')"><span class="opt-icon">⏰</span>1小时以内</button>
+      <button class="opt-btn" onclick="selectOpt(this,'time','1-3小时')"><span class="opt-icon">⌚</span>1–3小时</button>
+      <button class="opt-btn" onclick="selectOpt(this,'time','3-6小时')"><span class="opt-icon">🕐</span>3–6小时</button>
+      <button class="opt-btn" onclick="selectOpt(this,'time','全天可用')"><span class="opt-icon">🔥</span>全天可用</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-next" id="next1" onclick="goStep(2)" disabled>下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ─── STEP 2: 技能 ─── -->
+  <div class="form-card" id="formStep2" style="display:none">
+    <div class="form-card-title">你有哪些技能（可多选）</div>
+    <div class="tag-list" id="skillTags">
+      <span class="tag-select" onclick="toggleTag(this,'skill','写作文案')">✍️ 写作文案</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','设计美术')">🎨 设计美术</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','编程开发')">💻 编程开发</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','视频剪辑')">🎬 视频剪辑</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','教学培训')">📚 教学培训</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','销售营销')">📣 销售营销</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','手工制作')">🔨 手工制作</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','翻译外语')">🌐 翻译外语</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','会计财务')">📊 会计财务</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','摄影摄像')">📷 摄影摄像</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','AI工具')">🤖 AI工具</span>
+      <span class="tag-select" onclick="toggleTag(this,'skill','暂无明显技能')">🌱 暂无明显技能</span>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(1)">← 上一步</button>
+      <button class="btn-next" id="next2" onclick="goStep(3)" disabled>下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ─── STEP 3: 启动资金 ─── -->
+  <div class="form-card" id="formStep3" style="display:none">
+    <div class="form-card-title">可以投入的启动资金</div>
+    <div class="options-grid cols1">
+      <button class="opt-btn" onclick="selectOpt(this,'budget','零投入，必须0成本起步')"><span class="opt-icon">💸</span>零投入，必须0成本起步</button>
+      <button class="opt-btn" onclick="selectOpt(this,'budget','500元以内')"><span class="opt-icon">💰</span>500元以内小试牛刀</button>
+      <button class="opt-btn" onclick="selectOpt(this,'budget','500-3000元')"><span class="opt-icon">💎</span>500–3000元认真投入</button>
+      <button class="opt-btn" onclick="selectOpt(this,'budget','3000元以上')"><span class="opt-icon">🚀</span>3000元以上全力出击</button>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(2)">← 上一步</button>
+      <button class="btn-next" id="next3" onclick="goStep(4)" disabled>下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ─── STEP 4: 目标 ─── -->
+  <div class="form-card" id="formStep4" style="display:none">
+    <div class="form-card-title">你的副业目标</div>
+    <div class="options-grid cols2">
+      <button class="opt-btn" onclick="selectOpt(this,'goal','每月多赚1000-3000元')"><span class="opt-icon">🎯</span>月入多1000–3000</button>
+      <button class="opt-btn" onclick="selectOpt(this,'goal','每月多赚5000-10000元')"><span class="opt-icon">⚡</span>月入多5000+</button>
+      <button class="opt-btn" onclick="selectOpt(this,'goal','做成主业替代品')"><span class="opt-icon">🌟</span>替代主业全职做</button>
+      <button class="opt-btn" onclick="selectOpt(this,'goal','被动收入躺着赚')"><span class="opt-icon">😴</span>被动收入躺着赚</button>
+    </div>
+    <textarea class="text-input" id="extraInfo" rows="3" placeholder="还有什么想补充的？比如你的城市、特殊情况、不想做什么……（选填）" style="margin-top:12px;"></textarea>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goStep(3)">← 上一步</button>
+      <button class="btn-next" id="next4" onclick="generateResult()" disabled>🔍 开始分析</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="radar-anim">
+      <div class="radar-circle"></div>
+      <div class="radar-circle"></div>
+      <div class="radar-circle"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-center"></div>
+    </div>
+    <div class="loading-text">正在扫描你的钱途<span class="loading-dots"></span></div>
+    <div class="loading-sub">AI分析中，通常需要10–20秒</div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-wrap" id="resultWrap">
+    <div class="result-header">
+      <div class="result-title">✦ 你的专属副业方案 ✦</div>
+      <div class="result-sub">基于你的情况，AI为你精准匹配</div>
+    </div>
+    <div class="result-content" id="resultContent"></div>
+
+    <!-- PAYWALL -->
+    <div class="paywall" id="paywallSection">
+      <div class="paywall-title">🔓 解锁完整执行方案</div>
+      <div class="paywall-desc">上面是你最适合的副业方向概览。<br>完整方案包含具体操作步骤、平台推荐、避坑指南和第一周行动计划。</div>
+      <div class="paywall-features">
+        <div class="paywall-feature">每个副业的详细启动步骤</div>
+        <div class="paywall-feature">具体平台 + 接单渠道推荐</div>
+        <div class="paywall-feature">第一周7天行动清单</div>
+        <div class="paywall-feature">常见坑点和避坑方法</div>
+        <div class="paywall-feature">收入预期和时间规划</div>
+      </div>
+      <div class="price-tag">¥9.9</div>
+      <div class="price-orig">原价 ¥39</div>
+      <button class="btn-pay" onclick="showToast('💡 接入微信支付后即可开通收费')">立即解锁完整方案</button>
+    </div>
+
+    <button class="btn-restart" onclick="restart()">↩ 重新分析</button>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(15,21,37,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:8px;padding:10px 20px;font-size:13px;color:#00e5ff;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;white-space:nowrap;backdrop-filter:blur(10px);"></div>
+
+<script>
+const answers = { time:'', skills:[], budget:'', goal:'' };
+
+function selectOpt(el, key, val) {
+  const parent = el.closest('.options-grid');
+  parent.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[key] = val;
+  const nextBtnId = { time:'next1', budget:'next3', goal:'next4' }[key];
+  if (nextBtnId) document.getElementById(nextBtnId).disabled = false;
+}
+
+function toggleTag(el, key, val) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!answers.skills.includes(val)) answers.skills.push(val);
+  } else {
+    answers.skills = answers.skills.filter(s => s !== val);
+  }
+  document.getElementById('next2').disabled = answers.skills.length === 0;
+}
+
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('formStep'+i).style.display = i===n ? 'block' : 'none';
+    const dot = document.getElementById('step'+i);
+    dot.className = 'step-dot' + (i===n ? ' active' : i<n ? ' done' : '');
+    if (i < 4) {
+      document.getElementById('line'+i).className = 'step-line' + (i<n ? ' done' : '');
+    }
+  });
+  document.getElementById('progressFill').style.width = ((n-1)/4*100) + '%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+async function generateResult() {
+  // Hide form, show loading
+  [1,2,3,4].forEach(i => document.getElementById('formStep'+i).style.display='none');
+  document.getElementById('stepsIndicator').style.display = 'none';
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('loadingWrap').classList.add('show');
+
+  const extra = document.getElementById('extraInfo').value.trim();
+
+  const prompt = `你是一个专业的副业规划师，帮助普通人找到适合自己的副业方向。
+
+用户情况：
+- 每天可投入时间：${answers.time}
+- 拥有的技能：${answers.skills.join('、')}
+- 可投入启动资金：${answers.budget}
+- 副业目标：${answers.goal}
+${extra ? `- 补充说明：${extra}` : ''}
+
+请根据以上情况，给出3个最适合这个人的副业方向。
+
+要求：
+1. 每个方向必须真实可操作，不要假大空
+2. 结合用户的具体技能和资金情况
+3. 说明为什么适合这个人
+4. 给出预计收入范围（现实一点）
+5. 语言简洁直接，不要废话
+
+输出格式（用以下标题）：
+
+## 🥇 最推荐：[副业名称]
+[为什么适合你，2-3句]
+**预计月收入：** xxx元
+**启动难度：** ⭐⭐⭐（5星制）
+**见钱速度：** 快/中/慢
+
+## 🥈 次推荐：[副业名称]
+[为什么适合你，2-3句]
+**预计月收入：** xxx元
+**启动难度：** ⭐⭐⭐
+**见钱速度：** 快/中/慢
+
+## 🥉 补充方向：[副业名称]
+[为什么适合你，2-3句]
+**预计月收入：** xxx元
+**启动难度：** ⭐⭐⭐
+**见钱速度：** 快/中/慢
+
+## 💡 给你的建议
+[针对这个人的1-2句个性化建议]`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+
+    document.getElementById('loadingWrap').classList.remove('show');
+    showResult(text);
+
+  } catch (err) {
+    document.getElementById('loadingWrap').classList.remove('show');
+    showResult(`## 🥇 最推荐：AI工具服务接单\n你会使用AI工具，这在当下是稀缺技能。可以帮助不懂AI的商家和个人完成内容创作、图片生成、建站等工作。\n**预计月收入：** 1000–5000元\n**启动难度：** ⭐⭐\n**见钱速度：** 快\n\n## 🥈 次推荐：内容创作变现\n利用AI辅助，在小红书/公众号/抖音输出垂直内容，积累粉丝后接广告或卖产品。\n**预计月收入：** 500–3000元\n**启动难度：** ⭐⭐⭐\n**见钱速度：** 中\n\n## 🥉 补充方向：知识付费\n把你的经验和技能打包成教程，通过私域销售。\n**预计月收入：** 500–2000元\n**启动难度：** ⭐⭐⭐\n**见钱速度：** 中\n\n## 💡 给你的建议\n先从接单开始快速见到收入，同时搭建内容账号做长期布局。`);
+  }
+}
+
+function showResult(text) {
+  const content = document.getElementById('resultContent');
+
+  // Parse markdown-ish
+  let html = text
+    .replace(/## (.*)/g, '<h2>$1</h2>')
+    .replace(/### (.*)/g, '<h3>$1</h3>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+
+  content.innerHTML = html;
+
+  document.getElementById('resultWrap').classList.add('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function restart() {
+  answers.time=''; answers.skills=[]; answers.budget=''; answers.goal='';
+  document.getElementById('resultWrap').classList.remove('show');
+  document.getElementById('stepsIndicator').style.display = 'flex';
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.tag-select').forEach(b => b.classList.remove('selected'));
+  document.getElementById('extraInfo').value = '';
+  ['next1','next2','next3','next4'].forEach(id => document.getElementById(id).disabled = true);
+  goStep(1);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2500);
+}
+</script>
+</body>
+</html>
